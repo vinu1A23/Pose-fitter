@@ -1,10 +1,14 @@
 # Pose Fitter
 Counts pushup currently from video input
 
-https://user-images.githubusercontent.com/81124258/182865028-cbf02d09-c70d-4779-9bfe-0d60c3e1a637.mp4
+
 
 ##*Working*
 Based on angles calculates the direction of movement and contraints and when both directions have been checked the count increases.
+
+
+https://user-images.githubusercontent.com/81124258/185103272-71e9eef2-b293-46e2-bf8a-49682064e2aa.mp4
+
 
 ##*Errors and shortcomings*
   
