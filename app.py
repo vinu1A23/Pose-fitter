@@ -2,18 +2,15 @@ from flask import Flask, render_template, Response, request
 import cv2
 import datetime, time
 import os, sys
-import numpy as np
+
 from threading import Thread
-#import pyproj_write_txt_on_img as wrtetxt
 import pyproj2_aip as fitter
 
 
-global capture,rec_frame, grey, switch, neg, face, rec, out, greyExer
+global capture,rec_frame, switch, rec, out, Exer
 capture=0
-grey=0
-greyExer=0
-neg=0
-face=0
+
+Exer=0
 switch=1
 rec=0
 rec_frame=False
@@ -31,7 +28,7 @@ except OSError as error:
 app = Flask(__name__, template_folder='./templates')
 
 #making instance of class from scorer and debugger
-selector=fitter.select(debugger=True).exerc_1 
+selector=fitter.select(debugger=False).exerc_1 
 
 
 camera = cv2.VideoCapture(0)
@@ -43,56 +40,19 @@ def record(out):
         time.sleep(0.05)
         out.write(rec_frame)
 
-"""
-def detect_face(frame):
-    global net
-    (h, w) = frame.shape[:2]
-    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0,
-        (300, 300), (104.0, 177.0, 123.0))   
-    net.setInput(blob)
-    detections = net.forward()
-    confidence = detections[0, 0, 0, 2]
 
-    if confidence < 0.5:            
-            return frame           
-
-    box = detections[0, 0, 0, 3:7] * np.array([w, h, w, h])
-    (startX, startY, endX, endY) = box.astype("int")
-    try:
-        frame=frame[startY:endY, startX:endX]
-        (h, w) = frame.shape[:2]
-        r = 480 / float(h)
-        dim = ( int(w * r), 480)
-        frame=cv2.resize(frame,dim)
-    except Exception as e:
-        raise Exception(e) 
-        #pass
-    return frame
- 
-"""
 def gen_frames():  # generate frame by frame from camera
     global out, capture,rec_frame
     while True:
         success, frame = camera.read() 
         if success:
-            """
-            if(face):                
-                frame= detect_face(frame)
-            """
-            if(grey):
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            if(greyExer):
-                """
-                frame= cv2.putText (cv2.flip(frame,1), f'self.c(23) ', (400, 40), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)
-                frame= cv2.putText (frame, f'self.c(23) ', (400, 100), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)
-                frame= wrtetxt.Pose.write(frame)
-                """ 
+          
+            
+            if(Exer):
+                
                 frame=selector(cv2.flip(frame,1))
                 frame=cv2.flip(frame,1)
-            if(neg):
-                frame=cv2.bitwise_not(frame)    
+               
             if(capture):
                 capture=0
                 now = datetime.datetime.now()
@@ -133,15 +93,11 @@ def tasks():
         if request.form.get('click') == 'Capture':
             global capture
             capture=1
-        elif  request.form.get('grey') == 'Grey':
-            global grey
-            grey=not grey
-        elif  request.form.get('greyExer') == 'GreyExer':
-            global greyExer
-            greyExer=not greyExer
-        elif  request.form.get('neg') == 'Negative':
-            global neg
-            neg=not neg
+        
+        elif  request.form.get('Exer') == 'Exer':
+            global Exer
+            Exer=not Exer
+        
         
         elif request.form.get('stop') == 'Stop/Start':
             
@@ -170,13 +126,7 @@ def tasks():
     elif request.method=='GET':
         return render_template('index.html')
     return render_template('index.html')
-    """
-        elif  request.form.get('face') == 'Face Only':
-            global face
-            face=not face 
-            if(face):
-                time.sleep(4) 
-    """
+    
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
