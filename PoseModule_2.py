@@ -12,28 +12,65 @@ import math # Import math library for mathematical functions
 class poseDetector():
     def __init__(self, mode=False, upBody=False, smooth=True,
                  detectionCon=True, trackCon=True,debugger=False):  # Defining a class called poseDetector
-        self.mode=mode # Boolean, uses RGB camera feed if True, BGR otherwise 
-        self.upBody=upBody # Boolean, tracks full body if False, upper body only if True
-        self.smooth= smooth # Boolean, smoothens/filters positions in frames if True
-        self. detectionCon = detectionCon # Confidence value for detection
-        self.trackCon = trackCon # Confidence value for tracking
+        
+        #mode - Boolean, uses RGB camera feed if True, BGR otherwise 
+        #upBody - Boolean, tracks full body if False, upper body only if True
+        #smooth - Boolean, smoothens/filters positions in frames if True
+        #detectionCon - Confidence value for detection
+        #trackCon - Confidence value for tracking
+        #debugger - Boolean, shows debug info if True
+
+        self.mode=mode  
+        self.upBody=upBody 
+        self.smooth= smooth 
+        self. detectionCon = detectionCon 
+        self.trackCon = trackCon 
         self.mpDraw = mp. solutions .drawing_utils # Mediapipe drawing utilities 
-        self . mpPose = mp.solutions .pose # Mediapipe pose estimation model
-        self . pose = self.mpPose . Pose (self. mode, self. upBody, self. smooth,self. detectionCon, self. trackCon)# Initializes the pose model object
-        self.debugger=debugger # Boolean, shows debug info if True
+        self . mpPose = mp.solutions .pose         # Mediapipe pose estimation model
+        self . pose = self.mpPose . Pose (self. mode, self. upBody, self. smooth,self. detectionCon, self. trackCon) # Initializes the pose model object
+        self.debugger=debugger  
+    
+    #A function FindPose to find Landmarks from image
     def findPose (self, img, draw=False) :
+        
+        #img - Numpy array image for which pose landmarks are to be found
+        #draw - Boolean draws the landmarks
         
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) #Convert the image from BGR to RGB color format for processing
         self. results = self. pose . process (imgRGB) #Run the image through the pose estimation model
-        if self.results . pose_landmarks: #If pose landmarks were detected
-            if draw or self.debugger: #If set to draw the landmarks or debugger is enabled
+        
+        if self.results . pose_landmarks: 
+            #If pose landmarks were detected
+            
+            if draw or self.debugger: 
+                #If set to draw the landmarks or debugger is enabled
+                
                 self.mpDraw. draw_landmarks (img, self. results .pose_landmarks,self. mpPose . POSE_CONNECTIONS)
+        
         return img , self.results.pose_landmarks
-    def findPosition (self, img, draw=False) :#Define the findPosition method with parameters for the image and an option to draw
-        self.lmList=[]
+
+    #Define the findPosition method with parameters for the image and an option to draw
+    def findPosition (self, img, draw=False) :
+
+        #img - Numpy array image for which pose landmarks are to be found
+        #draw - Boolean draws the landmarks
+        
+        #Initialize an empty list to store landmarks
+        self.lmList=[] 
+        
         if self.results.pose_landmarks :
+
+            #Iterate through the pose landmarks
             for id, lm in enumerate (self. results . pose_landmarks. landmark):
+                
+                #id - identity nymber
+                #lm - landmark
+                
+                #h - height
+                #w- weight
+                
                 h, w, c= img.shape
+                
                 cx,cy=int(lm.x*w), int(lm.y*h)
                 self.lmList.append([id,cx,cy])
                 if draw or self.debugger:
