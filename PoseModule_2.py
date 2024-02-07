@@ -162,9 +162,9 @@ def main():
         fps= 1/ (cTime - pTime)                    # fps is frames per second
         pTime = cTime                              # initialize current time as starting time for next frame
         cv2.putText (img, str(int (fps) ), (70, 50), cv2. FONT_HERSHEY_PLAIN,3,
-                     (255, 0, 0), 3)
-        cv2.imshow("Image", img)
-        cv2.waitKey (1)
+                     (255, 0, 0), 3)               # print the frames per second on canvas
+        cv2.imshow("Image", img)                   # show the canvas with final image
+        cv2.waitKey (1)                            # pause at key 1
 
-if __name__ == "__main__" :
-    main () 
+if __name__ == "__main__" :                        # the __main__ namespace
+    main ()                                        # run the main function
