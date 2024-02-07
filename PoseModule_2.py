@@ -5,10 +5,10 @@ Created on Mon Mar 14 20:23:51 2022
 @author: dell
 """
 
-import cv2 # Import OpenCV library for computer vision
+import cv2             # Import OpenCV library for computer vision
 import mediapipe as mp # Import Mediapipe library for pose estimation
-import time # Import time library to calculate FPS
-import math # Import math library for mathematical functions
+import time            # Import time library to calculate FPS
+import math            # Import math library for mathematical functions
 
 # Defining a class called poseDetector
 class poseDetector():
@@ -27,12 +27,15 @@ class poseDetector():
         self.smooth= smooth 
         self. detectionCon = detectionCon 
         self.trackCon = trackCon 
+        self.debugger=debugger
+                     
         self.mpDraw = mp. solutions .drawing_utils # Mediapipe drawing utilities 
         self . mpPose = mp.solutions .pose         # Mediapipe pose estimation model
-        self . pose = self.mpPose . Pose (self. mode, self. upBody, self. smooth,self. detectionCon, self. trackCon) # Initializes the pose model object
-        self.debugger=debugger  
     
-    #A function FindPose to find Landmarks from image
+        # Initializes the pose model object
+        self . pose = self.mpPose . Pose (self. mode, self. upBody, self. smooth,self. detectionCon, self. trackCon) 
+    
+    #A function FindPose to find relative Landmarks from image
     def findPose (self, img, draw=False) :
         
         #img - Numpy array image for which pose landmarks are to be found
@@ -51,7 +54,7 @@ class poseDetector():
         
         return img , self.results.pose_landmarks
 
-    #Define the findPosition method with parameters for the image and an option to draw
+    #Define the findPosition to get absolute landmarks - method with parameters for the image and an option to draw
     def findPosition (self, img, draw=False) :
 
         #img - Numpy array image for which pose landmarks are to be found
@@ -120,41 +123,44 @@ class poseDetector():
                          cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)  #print angle on screen
         return angle
 
-    def findAngle2(self, img, p1, p2, p3,draw=False):
-        # get the landmark
-        x1, z1 = self.results.pose_landmarks.landmark[p1].x, self.results.pose_landmarks.landmark[p1].z
-        x2, z2 = self.results.pose_landmarks.landmark[p2].x, self.results.pose_landmarks.landmark[p2].z
-        x3, z3 = self.results.pose_landmarks.landmark[p3].x, self.results.pose_landmarks.landmark[p3].z
-        y2= self.results.pose_landmarks.landmark[p2].y
-        # calculate the angle
-        angle = math.degrees(math.atan2(z3 - z2, x3 - x2) - math.atan2(z1 - z2, x1 - x2))
-        if angle > 180:
-            angle = 360-angle
-        cv2.putText(img, str(int(angle)), (int(x2 - 50), int(y2 - 50)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
-
-
-        return angle
+    #Function confidence to check visibility of landmarks
     def confidence(self,img,p,draw= True) :
+
+        #img - Numpy array - representation of image
+        #p - int - index of landmark for which visibility is to be checked
+        #draw - Boolean - True to write on the canvas 
+
+        #return visibility
         return self.results.pose_landmarks.landmark[p].visibility
 
-
+#Function main to test the functionality of poseDetector class
 def main():
-    cap = cv2.VideoCapture (" PoseVideos/1.mp4")
-    pTime = 0
-    detector = poseDetector()
+    
+    #The VideoCapture function can have either value 0 for camera feed or video path or url
+    cap = cv2.VideoCapture (" PoseVideos/1.mp4") 
+    
+    pTime = 0                                      # start time set to 0
+    detector = poseDetector()                      # initializing poseDetector Class
+    
     while True:
-        success, img = cap.read()
-        if success==False:
+        success, img = cap.read()                  # reading from source for data
+        
+        if success==False:                         # if no source, print message and exit
             print("no stream ... exiting")
             break
-        img ,result= detector.findPose(img,False)
-        lmList = detector.findPosition (img , draw=False)
-        if len (lmList) != 0:
-            print (lmList [14])
-            cv2.circle (img, (lmList [14] [1], lmList [14] [2]), 15, (0, 0, 255), cv2.FILLED)
-        cTime = time . time ()
-        fps= 1/ (cTime - pTime)
-        pTime = cTime
+        
+        img ,result= detector.findPose(img)        # find relative landmarks from image
+        lmList = detector.findPosition (img )      # find absolute position of landmarks
+        
+        if len (lmList) != 0:                      # Ensure absolute Landmark data is there
+            print (lmList [14])                    # printing the 14th landmark point data on console output
+            
+            #drawing a circle at 14th landmark point
+            cv2.circle (img, (lmList [14] [1], lmList [14] [2]), 15, (0, 0, 255), cv2.FILLED) 
+             
+        cTime = time . time ()                     # time at which frame is being shown
+        fps= 1/ (cTime - pTime)                    # fps is frames per second
+        pTime = cTime                              # initialize current time as starting time for next frame
         cv2.putText (img, str(int (fps) ), (70, 50), cv2. FONT_HERSHEY_PLAIN,3,
                      (255, 0, 0), 3)
         cv2.imshow("Image", img)
