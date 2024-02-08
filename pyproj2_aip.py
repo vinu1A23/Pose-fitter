@@ -5,24 +5,38 @@ Created on Mon Mar 14 19:38:45 2022
 @author: dell
 """
 
-from pickle import FALSE
-import cv2
-import numpy as np
-import PoseModule_2 as pm
-#import tensorflow as tf
+import cv2                    # import the OpenCV library
+import numpy as np            # import the numpy library
+import PoseModule_2 as pm     # import PoseModule_2 containing our processing functions
 
-
+# A class select to select different exercises
 class select():
+
+    #Function __init__ to run at creation of class select
     def __init__(self,detector=pm.poseDetector(),count=0,dir1=1,dir2=1,debugger=False):
+
+        #self     - reference to self
+        #detector - poseDetector object used to set to a instance of poseDetector class from the PoseModule_2
+        #count    - integer used to set count of exercise to 0 by default.
+        #dir1     - integer used to set direction for left side. 1 by default
+        #dir2     - integer used to set direction for right side. 1 by default
+        #debugger - boolean used for debugger state. False by default.
+
         self.detector=pm.poseDetector(debugger=debugger)
         self.count=0
         self.dir1=dir1
         self.dir2=dir2
         self.debugger=debugger
+
+    #Function start to set initial condition of exercise/ can be used to restart exercise
     def start(self,):
-        self.count=0
-        self.dir1=1
-        self.dir2=1
+
+        #self - reference to self
+        self.count=0 # set initial count to 0
+        self.dir1=1  # set initial direction for left side to 1
+        self.dir2=1  # set initial direction for right side to 1
+
+    
     def c(self,img,p) :
         return self.detector.confidence(img,p)
 
