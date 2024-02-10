@@ -13,7 +13,7 @@ import PoseModule_2 as pm     # import PoseModule_2 containing our processing fu
 class select():
 
     #Function __init__ to run at creation of class select
-    def __init__(self,detector=pm.poseDetector(),count=0,dir1=1,dir2=1,debugger=False):
+    def __init__(self,detector=pm.poseDetector(),count:int=0,dir1:int=1,dir2:int=1,debugger:bool=False)->None:
 
         #self     - reference to self
         #detector - poseDetector object used to set to a instance of poseDetector class from the PoseModule_2
@@ -29,64 +29,68 @@ class select():
         self.debugger=debugger
 
     #Function start to set initial condition of exercise/ can be used to restart exercise
-    def start(self,):
+    def start(self,) -> None:
 
         #self - reference to self
         self.count=0 # set initial count to 0
         self.dir1=1  # set initial direction for left side to 1
         self.dir2=1  # set initial direction for right side to 1
 
-    
-    def c(self,img,p) :
-        return self.detector.confidence(img,p)
+    #Function c to tell the visibility of the landmark in the image
+    def c(self, img:np.ndarray, p:int) -> float:
+        return self. detector. confidence(img,p)
 
-    #### APPLY GROUND DETECTION for PUSHUP ,BELOW IS POSSIBLE VERTICALLY
-    ####SO GROUND DETECTION SHOULD BE HORIZONTAL
-    def exerc_1(self,frame):
+    #Function exerc_1 has angle calculations for the pushup and shows the push ups done on screen
+    def exerc_1(self,frame:np.ndarray) -> np.ndarray:
         
-            
+        #frame - numpy.ndarray used to represent the image data           
         
-        """
-        success, img=cap.read()
-        if not success:
-            print("Can't receive frame (stream end?). Exiting ...")
-            break
-        """
-        img= cv2.resize(frame,(1580,900))
-        #img= cv2.imread("img/test.jpg")
-
-
-        img,result=self.detector.findPose(img)
-        #print(result.pose_landmarks.visibility)
+        img= cv2.resize(frame,(1580,900))                   #resize the image to visible screen size
         
-        # Our operations on the frame come here
-        lmList=self.detector.findPosition(img,False)
-        #gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img,result=self.detector.findPose(img)              #find the relative positions of landmarks
+                                                            #image without landmarks drawn is returned 
+                                                            #if findpose does not have draw or debugger as True
+        
+        lmList=self.detector.findPosition(img)              #find the absolute position of the landmarks
+        
 
         if len(lmList)!=0:
-            """print("hip : ",self.c(24))
-            print("elbow : ",self.c(14))
-            print("ankle : ", self.c(12))"""
-            #left arm
-            angle=self.detector.findAngle(img,12,14,16)  #joints in mediapipe
-            #right arm
-            angle4=self.detector.findAngle(img,11,13,15)
-            #left leg
-            angle2=self.detector.findAngle(img,24,26,28)
-            #right leg        
-            angle5=self.detector.findAngle(img,23,25,27)
-            #right shoulder and waist and ankle
-            angle6=self.detector.findAngle(img,27,23,11)
-            angle3=self.detector.findAngle(img,28,24,12)
-            """angle3=self.detector.findAngle2(img,14,12,24)
-            print("shoulder angle : ",angle3)
-            #cv2.putText(img, str(int(angle3)), (int(x2 - 50), int(y2 - 50)), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)"""
-            per=np.interp(angle,(150,65),(0,100))
-            #bar=np.interp(angle,(760,180),(600,100))
-            per2=np.interp(angle4,(256,199),(0,100))
-            #bar2=np.interp(angle4,(760,180),(600,100))
+
+            #0 - nose
+            #11 - left shoulder
+            #12 - right shoulder
+            #13 - left elbow
+            #14 - right elbow
+            #15 - left wrist                                
+            #16 - right wrist
+            #23 - left hip
+            #24 - right hip
+            #25 - left knee
+            #26 - right knee
+            #27 - left ankle
+            #28 - right ankle
+            #29 - left heel
+            #30 - right heel
+
             
-            if 170<= angle2 <=190 and self.c(img,24)>0.9 and self.c(img,26)>0.9 and self.c(img,28) >0.9:
+            angle=self.detector.findAngle(img,12,14,16)     #right arm - angle at elbow
+
+            angle4=self.detector.findAngle(img,11,13,15)    #left arm - angle at elbow
+            
+            angle2=self.detector.findAngle(img,24,26,28)    #right leg - angle at knee
+                    
+            angle5=self.detector.findAngle(img,23,25,27)    #left leg - angle at knee
+            
+            angle6=self.detector.findAngle(img,27,23,11)    #left side - angle at hip from ankle and shoulder
+            
+            angle3=self.detector.findAngle(img,28,24,12)    #right side - angle at hip from ankle and shoulder
+            
+            per=np.interp(angle,(150,65),(0,100))           #angle at elbow percentage from 0 to 100 for left side
+            
+            per2=np.interp(angle4,(256,199),(0,100))        #angle at elbow percentage from 0 to 100 for right side            
+
+            #if back is straight and visibility is high
+            if 170 <= angle2 <= 190 and all(self.c(img, i) > 0.9 for i in (24, 26, 28)): 
                 if per == 100:
                     if self.dir1== 0:
                         self.count += 0.5
