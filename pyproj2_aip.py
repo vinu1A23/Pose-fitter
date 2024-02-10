@@ -18,8 +18,8 @@ class select():
         #self     - reference to self
         #detector - poseDetector object used to set to a instance of poseDetector class from the PoseModule_2
         #count    - integer used to set count of exercise to 0 by default.
-        #dir1     - integer used to set direction for left side. 1 by default
-        #dir2     - integer used to set direction for right side. 1 by default
+        #dir1     - integer used to set direction for right side. 1 by default
+        #dir2     - integer used to set direction for left side. 1 by default
         #debugger - boolean used for debugger state. False by default.
 
         self.detector=pm.poseDetector(debugger=debugger)
@@ -33,8 +33,8 @@ class select():
 
         #self - reference to self
         self.count=0 # set initial count to 0
-        self.dir1=1  # set initial direction for left side to 1
-        self.dir2=1  # set initial direction for right side to 1
+        self.dir1=1  # set initial direction for right side to 1
+        self.dir2=1  # set initial direction for left side to 1
 
     #Function c to tell the visibility of the landmark in the image
     def c(self, img:np.ndarray, p:int) -> float:
@@ -85,29 +85,25 @@ class select():
             
             angle3=self.detector.findAngle(img,28,24,12)    #right side - angle at hip from ankle and shoulder
             
-            per=np.interp(angle,(150,65),(0,100))           #angle at elbow percentage from 0 to 100 for left side
+            per=np.interp(angle,(150,65),(0,100))           #angle at elbow percentage from 0 to 100 for right side
             
-            per2=np.interp(angle4,(256,199),(0,100))        #angle at elbow percentage from 0 to 100 for right side            
+            per2=np.interp(angle4,(256,199),(0,100))        #angle at elbow percentage from 0 to 100 for left side            
 
             #if back is straight and visibility is high
             if 170 <= angle2 <= 190 and all(self.c(img, i) > 0.9 for i in (24, 26, 28)): 
-                if per == 100:
-                    if self.dir1== 0:
-                        self.count += 0.5
-                        self.dir1= 1
-                if per == 0:
-                    if self.dir1== 1:
-                        self.count += 0.5
-                        self.dir1= 0
+                if per == 100:                              #if maximum angle that is 65 at right elbow
+                    if self.dir1== 0:                       #if direction is relaxing
+                        self.count += 0.5                   #count half push up
+                        self.dir1= 1                        #change direction to contracting
+                        
+                if per == 0:                                #if minimum angle that is 150 at right elbow
+                    if self.dir1== 1:                       #if direction is contracting
+                        self.count += 0.5                   #count half push up
+                        self.dir1= 0                        #change direction to relaxing
+                        
                 if 170>= angle3 or angle3>=190 :
-                    #print("your hip should be in straight alignment with ankle and shoulder")
-                    """
-                    #update this--------------------
-                    if t==0:
-                        score-=0.2
-                        print("your hip should be in straight alignment with ankle and shoulder")
-                    t=1
-                    """
+                    print("your hip should be in straight alignment with ankle and shoulder")
+                    
             
             elif 163<= angle5 <=171 and self.c(img,23)>0.9 and self.c(img,25)>0.9 and self.c(img,27) >0.9:
                 if per2 == 100:
