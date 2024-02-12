@@ -131,23 +131,28 @@ if __name__=="__main__":                                    #code for testing
     
     try:
         sel_exerc=select(debugger=0)                        #make instance of select class to select exercise
-        cap=cv2.VideoCapture(" PoseVideos/1.mp4")
+        cap=cv2.VideoCapture("PoseVideos/1.mp4")            #initialize video source
         
-        while True:
-            success, img=cap.read()
-            if not success:
-                print("Can't receive frame (stream end?). Exiting ...")
-                break
-            img=sel_exerc.exerc_1(img)
+        while True:                                         #Read the all the frames in the video source
+            success, img=cap.read()                         #Read frames one by one
+            if not success:                                 #if the video source has ended or is missing
+                print("No frame (stream end?). Exiting")    #print the message to screen and exit
+                break                                       #get out of the loop
+            
+            img=sel_exerc.exerc_1(img)                      #process the image through the push up exercise
 
-            cv2.imshow("Image",img)
-            key=cv2.waitKey(1)
-            if key%256==27:
-                break
-        cap.release()
-        cv2.destroyAllWindows()
-    except:
-        print("something broke")
+            cv2.imshow("Image",img)                         #show the image through windowed screen
+            
+            key=cv2.waitKey(1)                              #wait for 1 millisecond
+            
+            if key%256==27:                                 #if ascii 27(escape key) is pressed
+                break                                       #get out of loop
+        
+        cap.release()                                       #release the connection to the video source
+        cv2.destroyAllWindows()                             #delete the instances of windowed screens
+    
+    except:                                                 #if some error occured in above code in some part
+        print("something broke")                            #print the error message
 
 
     
