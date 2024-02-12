@@ -89,59 +89,48 @@ class select():
             
             per2=np.interp(angle4,(256,199),(0,100))        #angle at elbow percentage from 0 to 100 for left side            
 
-            #if back is straight and visibility is high
+            #if right leg knee is straight and visibility is high
             if 170 <= angle2 <= 190 and all(self.c(img, i) > 0.9 for i in (24, 26, 28)): 
-                if per == 100:                              #if maximum angle that is 65 at right elbow
+                
+                if per == 100:                              #if maximum contraction angle(65) at right elbow
                     if self.dir1== 0:                       #if direction is relaxing
                         self.count += 0.5                   #count half push up
                         self.dir1= 1                        #change direction to contracting
                         
-                if per == 0:                                #if minimum angle that is 150 at right elbow
+                if per == 0:                                #if minimum contraction angle(150) at right elbow
                     if self.dir1== 1:                       #if direction is contracting
                         self.count += 0.5                   #count half push up
                         self.dir1= 0                        #change direction to relaxing
                         
-                if 170>= angle3 or angle3>=190 :
-                    print("your hip should be in straight alignment with ankle and shoulder")
+                if 170>= angle3 or angle3>=190 :            #if angle at hip from ankle and shoulder is not straight
+                    print("your hip should be straight")    #print this message
                     
+            #if left leg knee is straight and visibility is high
+            elif 163<= angle5 <=171 and all(self.c(img,i) >0.9 for i in (23,25,27)):
+                
+                if per2 == 100:                             #if maximum contraction angle(199) at left elbow
+                    if self.dir2 == 0:                      #if direction is relaxing
+                        self.count += 0.5                   #count half push up
+                        self.dir2 = 1                       #change direction to contracting
+                
+                if per2 == 0:                               #if minimum contraction angle(256) at left elbow
+                    if self.dir2 == 1:                      #if direction is contracting
+                        self.count += 0.5                   #count half push up
+                        self.dir2 = 0                       #change direction to relaxing
+                
+                if 166>= angle6 or angle6>=184 :            #if angle at hip from ankle and shoulder is not straight
+                    print("your hip should be in straight") #print this message     
             
-            elif 163<= angle5 <=171 and self.c(img,23)>0.9 and self.c(img,25)>0.9 and self.c(img,27) >0.9:
-                if per2 == 100:
-                    if self.dir2 == 0:
-                        self.count += 0.5
-                        self.dir2 = 1
-                if per2 == 0:
-                    if self.dir2 == 1:
-                        self.count += 0.5
-                        self.dir2 = 0
-                if 166>= angle6 or angle6>=184 :
-                    print("your hip should be in straight alignment with ankle and shoulder")        
             
-            #elif 170<= angle2 <=190 and self.c(24)>0.9 and self.c(26)>0.9 and self.c(28) >0.9:
-           
-            # Draw Bar
-            """
-            cv2.rectangle (img, (680, 180), (750, 650), (0, 255, 0), 3)
-            cv2.rectangle (img, (680, int (bar+60) ) , (750, 550) , (0, 255, 0), cv2.FILLED)
+            cv2.putText(img , str(int (self.count)), (0,100), cv2. FONT_HERSHEY_PLAIN, 5,
+                          (255,0,0),10)                     #print the number of push ups done on image
             
-            cv2.putText (img, f'self.c(23) {self.c(23)}', (590, 40), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)
-            cv2.putText (img, f'self.c(25) {self.c(25)}', (590, 70), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)
-            cv2.putText (img, f'self.c(27) {self.c(27)}', (590, 90), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)
-            cv2.putText (img, f'angle {angle6}', (590, 140), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)
-            cv2.putText (img, f' {int (per) }%', (500, 75), cv2. FONT_HERSHEY_PLAIN, 4,
-                           (255, 8, 0), 4)        
-            """         
-            cv2.putText (img , str(int (self.count)), (0,100), cv2. FONT_HERSHEY_PLAIN, 5,
-                          (255,0,0),10)       
-        return img
+        return img                                          #return the processed image
 
-if __name__=="__main__":
+if __name__=="__main__":                                    #code for testing
+    
     try:
-        sel_exerc=select(debugger=0)
+        sel_exerc=select(debugger=0)                        #make instance of select class to select exercise
         cap=cv2.VideoCapture(" PoseVideos/1.mp4")
         
         while True:
