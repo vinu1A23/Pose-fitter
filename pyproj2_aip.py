@@ -127,6 +127,9 @@ class select():
             
         return img                                          #return the processed image
 
+    def exerc_2(self,frame:np.ndarray) -> np.ndarray:
+        pass
+
 if __name__=="__main__":                                    #code for testing
     
     try:
