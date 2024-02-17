@@ -128,7 +128,36 @@ class select():
         return img                                          #return the processed image
 
     def exerc_2(self,frame:np.ndarray) -> np.ndarray:
-        pass
+        #frame - numpy.ndarray used to represent the image data           
+        
+        img= cv2.resize(frame,(1580,900))                   #resize the image to visible screen size
+        
+        img,result=self.detector.findPose(img)              #find the relative positions of landmarks
+                                                            #image without landmarks drawn is returned 
+                                                            #if findpose does not have draw or debugger as True
+        
+        lmList=self.detector.findPosition(img)              #find the absolute position of the landmarks
+        
+
+        if len(lmList)!=0:
+
+            #0 - nose
+            #11 - left shoulder
+            #12 - right shoulder
+            #13 - left elbow
+            #14 - right elbow
+            #15 - left wrist                                
+            #16 - right wrist
+            #23 - left hip
+            #24 - right hip
+            #25 - left knee
+            #26 - right knee
+            #27 - left ankle
+            #28 - right ankle
+            #29 - left heel
+            #30 - right heel
+            return img
+        return img
 
 if __name__=="__main__":                                    #code for testing
     
