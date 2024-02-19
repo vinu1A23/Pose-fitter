@@ -156,6 +156,22 @@ class select():
             #28 - right ankle
             #29 - left heel
             #30 - right heel
+            angle=self.detector.findAngle(img,12,14,16)     #right arm - angle at elbow
+
+            angle4=self.detector.findAngle(img,11,13,15)    #left arm - angle at elbow
+            
+            angle2=self.detector.findAngle(img,24,26,28)    #right leg - angle at knee
+                    
+            angle5=self.detector.findAngle(img,23,25,27)    #left leg - angle at knee
+            
+            angle6=self.detector.findAngle(img,27,23,11)    #left side - angle at hip from ankle and shoulder
+            
+            angle3=self.detector.findAngle(img,28,24,12)    #right side - angle at hip from ankle and shoulder
+            
+            per=np.interp(angle,(150,65),(0,100))           #angle at elbow percentage from 0 to 100 for right side
+            
+            per2=np.interp(angle4,(256,199),(0,100))        #angle at elbow percentage from 0 to 100 for left side            
+
             return img
         return img
 
